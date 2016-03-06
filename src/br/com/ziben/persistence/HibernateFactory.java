@@ -92,18 +92,24 @@ public class HibernateFactory {
      * @throws HibernateException
      */
     private static SessionFactory configureSessionFactory() throws HibernateException {
-		String nomeArquivo = System.getProperty("persistence.configuration");
-		if (nomeArquivo == null) {
-			nomeArquivo = "./" + "persistence.properties";
-			log.info(">> configureSessionFactory(): Setando arquivo de configuracoes " + nomeArquivo);
-		}
-		log.debug(">> configureSessionFactory() arquivo de configuracao: " + nomeArquivo);
-		File configFile = new File(nomeArquivo);
+		log.info(">> configureSessionFactory()");
 
-        Configuration configuration = new Configuration();
-        configuration.configure(configFile);
-        serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
-        sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+		try {
+			String nomeArquivo = System.getProperty("persistence.configuration");
+			if (nomeArquivo == null) {
+				nomeArquivo = "./" + "hibernate.cfg.xml";
+				log.info(">> configureSessionFactory(): Setando arquivo de configuracoes " + nomeArquivo);
+			}
+			log.debug(">> configureSessionFactory() arquivo de configuracao: " + nomeArquivo);
+			File configFile = new File(nomeArquivo);
+
+			Configuration configuration = new Configuration();
+			configuration.configure(configFile);
+			serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+			sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
         return sessionFactory;
     }

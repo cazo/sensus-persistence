@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+
+		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory name="Collectors">
+<!--    vai retirar os dados do datasource
+        <property name="hibernate.connection.driver_class">org.gjt.mm.mysql.Driver</property>
+        <property name="hibernate.connection.password">sapucaia</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/sensus</property>
+        <property name="hibernate.connection.username">root</property>
+-->        
+        <property name="hibernate.connection.datasource">java:/ziben/sensus</property>
+        <property name="hibernate.show_sql">true</property>
+		<property name="hibernate.format_sql">false</property>
+		<property name="hbm2ddl.auto">update</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property>
+        
+        <mapping class="br.com.ziben.model.SensusParameter" />
+    </session-factory>
+
+</hibernate-configuration>

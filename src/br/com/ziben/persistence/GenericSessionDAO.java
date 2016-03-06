@@ -44,11 +44,12 @@ public abstract class GenericSessionDAO<T> {
         }
     }
 
-    protected Object find(String id) {
+    protected Object find(Integer id) {
         Object obj = null;
+        System.out.println("******* find() >>>>" + this.classe.getClass());
         try {
             startOperation();
-            obj = session.load(this.classe.getClass(), id);
+            obj =  session.load(this.classe.getClass(), id);
             //tx.commit();
         } catch (HibernateException e) {
             handleException(e);
