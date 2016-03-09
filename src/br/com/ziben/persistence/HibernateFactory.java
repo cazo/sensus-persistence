@@ -17,6 +17,7 @@ import org.hibernate.service.ServiceRegistry;
  *
  */
 public class HibernateFactory {
+	
     private static SessionFactory sessionFactory;
     private static ServiceRegistry serviceRegistry;
     private static Logger log = Logger.getLogger(HibernateFactory.class);
@@ -28,6 +29,7 @@ public class HibernateFactory {
      */
     public static SessionFactory buildSessionFactory() throws HibernateException {
         if (sessionFactory != null) {
+        	log.info(">> buildSessionFactory():closeFactory()");
             closeFactory();
         }
         return configureSessionFactory();
@@ -38,27 +40,32 @@ public class HibernateFactory {
      */
     public static SessionFactory buildIfNeeded() throws DataAccessLayerException{
         if (sessionFactory != null) {
+        	log.info(">> buildIfNeeded(): sessionFactory != null");
             return sessionFactory;
         }
         try {
+        	log.info(">> buildIfNeeded(): return configureSessionFactory()");
             return configureSessionFactory();
         } catch (HibernateException e) {
             throw new DataAccessLayerException(e);
         }
     }
     public static SessionFactory getSessionFactory() {
+    	log.info(">> getSessionFactory(): return sessionFactory");
         return sessionFactory;
     }
     
 
     public static Session openSession() throws HibernateException {
         buildIfNeeded();
+    	log.info(">> openSession(): return sessionFactory.openSession()");
         return sessionFactory.openSession();
     }
 
     public static void closeFactory() {
         if (sessionFactory != null) {
             try {
+            	log.info(">> closeFactory(): sessionFactory != null; sessionFactory.close()");
                 sessionFactory.close();
             } catch (HibernateException ignored) {
                 log.error("Não foi possível fechar a SessionFactory", ignored);
@@ -69,6 +76,7 @@ public class HibernateFactory {
     public static void close(Session session) {
         if (session != null) {
             try {
+            	log.info(">> close(): session.close()");
                 session.close();
             } catch (HibernateException ignored) {
                 log.error("Não foi possivel fechar a sessão", ignored);
@@ -79,6 +87,7 @@ public class HibernateFactory {
     public static void rollback(Transaction tx) {
         try {
             if (tx != null) {
+            	log.info(">> rollback(): tx.rollback()");
                 tx.rollback();
             }
         } catch (HibernateException ignored) {
