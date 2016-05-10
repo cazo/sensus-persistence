@@ -26,6 +26,12 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.context.internal.ManagedSessionContext;
 
+/**
+ * Class to handle DAOs by a generic hibernate session
+ * @author ccardozo
+ *
+ * @param <T>
+ */
 @SuppressWarnings("unchecked")
 public abstract class GenericSessionDAO<T> {
 	
