@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with sensus-persistence.  If not, see <http://www.gnu.org/licenses/>.
 */
-package br.com.ziben.persistence.dialectfix;
+package br.com.ziben.dialectfix;
 
 import java.sql.Types;
 

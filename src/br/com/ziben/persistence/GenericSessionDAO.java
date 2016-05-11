@@ -19,12 +19,10 @@ package br.com.ziben.persistence;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.context.internal.ManagedSessionContext;
 
 /**
  * Class to handle DAOs by a generic hibernate session
@@ -106,8 +104,8 @@ public abstract class GenericSessionDAO<T> {
 
     protected void startOperation() throws HibernateException {
         session = HibernateFactory.openSession();
-        session.setFlushMode(FlushMode.MANUAL);
-        ManagedSessionContext.bind(session);
+        //session.setFlushMode(FlushMode.MANUAL);
+        //ManagedSessionContext.bind(session);
         tx = session.beginTransaction();
     }
 }

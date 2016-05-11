@@ -28,7 +28,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
 /**
- * Classe para coisas de Hibernate Factoring
+ * Class for things about Hibernate Factoring
  * @author ccardozo
  *
  */
