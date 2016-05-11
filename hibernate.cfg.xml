@@ -15,7 +15,7 @@
 -->        
 		<!-- conexao via JNDI -->
         <property name="hibernate.connection.datasource">java:/intellector/totvs</property>
-        <property name="hibernate.dialect">br.com.ziben.dialectfix.Oracle10gDialectFix</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
         
         <property name="hibernate.show_sql">true</property>
 		<property name="hibernate.format_sql">false</property>
