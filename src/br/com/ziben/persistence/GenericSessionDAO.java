@@ -29,6 +29,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.context.internal.ManagedSessionContext;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Projections;
 
 /**
  * Class to handle DAOs by a generic hibernate session factoring
@@ -129,6 +130,25 @@ public abstract class GenericSessionDAO<T> {
             HibernateFactory.close(session);
         }
 		return list;
+    }
+
+    protected Long countForPagination() {
+		log.info(">>GenericSessionDAO:countForPagination()");
+		
+		Long count = 0L;
+		
+		try {
+            startOperation();
+    		Criteria criteriaCount = session.createCriteria(this.classe);
+    		criteriaCount.setProjection(Projections.rowCount());
+			count = (Long) criteriaCount.uniqueResult();
+		} catch (HibernateException e) {
+            handleException(e);
+        } finally {
+    		log.info("<<GenericSessionDAO:countForPagination()");
+            HibernateFactory.close(session);
+        }
+		return count;
     }
 
     protected List<?> runQuery(String strQuery) {
