@@ -22,12 +22,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.context.internal.ManagedSessionContext;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 
@@ -194,8 +192,6 @@ public abstract class GenericSessionDAO<T> {
     protected void startOperation() throws HibernateException {
         log.debug(">>GenericSessionDAO:startOperation()");
         session = HibernateFactory.openSession();
-        session.setFlushMode(FlushMode.MANUAL);
-        ManagedSessionContext.bind(session);
         tx = session.beginTransaction();
         log.debug("<<GenericSessionDAO:startOperation()");
     }
