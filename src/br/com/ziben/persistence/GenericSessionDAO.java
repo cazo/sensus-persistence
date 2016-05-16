@@ -132,7 +132,7 @@ public abstract class GenericSessionDAO<T> {
 		return list;
     }
 
-    protected Long countForPagination() {
+    protected Long rowsCount() {
 		log.info(">>GenericSessionDAO:countForPagination()");
 		
 		Long count = 0L;
