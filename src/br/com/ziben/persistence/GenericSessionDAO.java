@@ -150,6 +150,25 @@ public abstract class GenericSessionDAO<T> {
         }
 		return count;
     }
+    
+    protected List<T> listForPagination(int start, int finish) {
+		log.info(">>GenericSessionDAO:listForPagination()");
+		List<T> pages = null;
+		try {
+            startOperation();
+            Criteria criteria = session.createCriteria(this.classe);
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(finish);
+            pages = criteria.list();
+
+		} catch (HibernateException e) {
+            handleException(e);
+        } finally {
+    		log.info("<<GenericSessionDAO:listForPagination()");
+            HibernateFactory.close(session);
+        }
+		return pages;
+    }
 
     protected List<?> runQuery(String strQuery) {
 		log.info(">>GenericSessionDAO:runQuery()");
