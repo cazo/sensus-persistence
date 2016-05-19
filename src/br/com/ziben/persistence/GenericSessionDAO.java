@@ -173,7 +173,8 @@ public abstract class GenericSessionDAO<T> {
 		List<?> list = null;
 		try {
             startOperation();
-		    Query query = session.createSQLQuery(strQuery);
+		    //Query query = session.createSQLQuery(strQuery);
+		    Query query = session.createQuery(strQuery);
 		    list = query.list();
 		} catch (HibernateException e) {
             handleException(e);
