@@ -22,14 +22,16 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 /**
- * Class to handle DAOs by a generic hibernate session factoring
+ * Class to handle DAOs by a generic hibernate session factoring;
+ * essa classe deve ser usada qunado se quer mais controle do
+ * session factory, como acessos a session e transaction para queries
+ * 
  * @author ccardozo
  *
- * @param <T>
  */
 public abstract class SimpleSessionDAO {
 	
-	private Logger log = Logger.getLogger("GenericCDISessionDAO");
+	private Logger log = Logger.getLogger("SimpleSessionDAO");
 	
     public Session session;
     public Transaction tx;
@@ -48,9 +50,9 @@ public abstract class SimpleSessionDAO {
     }
     
     public void startOperation() throws HibernateException {
-        log.debug(">>GenericCDISessionDAO:startOperation()");
+        log.debug(">>SimpleSessionDAO:startOperation()");
         session = HibernateFactory.openSession();
         tx = session.beginTransaction();
-        log.debug("<<GenericCDISessionDAO:startOperation()");
+        log.debug("<<SimpleSessionDAO:startOperation()");
     }
 }
