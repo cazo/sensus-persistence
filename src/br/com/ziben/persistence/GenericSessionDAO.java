@@ -168,18 +168,17 @@ public abstract class GenericSessionDAO<T> {
 		return pages;
     }
 
-    protected List<?> runQuery(String strQuery) {
-		log.info(">>GenericSessionDAO:runQuery()");
-		List<?> list = null;
+    protected List<T> runQueryEntity(String strQuery) {
+		log.info(">>GenericSessionDAO:runQueryEntity()");
+		List<T> list = null;
 		try {
             startOperation();
-		    //Query query = session.createSQLQuery(strQuery);
-		    Query query = session.createQuery(strQuery);
+		    Query query = session.createSQLQuery(strQuery);
 		    list = query.list();
 		} catch (HibernateException e) {
             handleException(e);
         } finally {
-    		log.info("<<GenericSessionDAO:runQuery()");
+    		log.info("<<GenericSessionDAO:runQueryEntity()");
             HibernateFactory.close(session);
         }
 		return list;
