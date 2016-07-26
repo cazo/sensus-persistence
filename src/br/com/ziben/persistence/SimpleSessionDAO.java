@@ -45,11 +45,11 @@ public abstract class SimpleSessionDAO {
         throw new DataAccessLayerException(e);
     }
 
-    public void close() {
+    public void closeTransaction() {
         HibernateFactory.close(session);
     }
     
-    public void startOperation() throws HibernateException {
+    public void beginTransaction() throws HibernateException {
         log.debug(">>SimpleSessionDAO:startOperation()");
         session = HibernateFactory.openSession();
         tx = session.beginTransaction();
