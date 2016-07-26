@@ -50,9 +50,9 @@ public abstract class SimpleSessionDAO {
     }
     
     public void beginTransaction() throws HibernateException {
-        log.debug(">>SimpleSessionDAO:startOperation()");
+        log.debug(">> SimpleSessionDAO.beginTransaction()");
         session = HibernateFactory.openSession();
         tx = session.beginTransaction();
-        log.debug("<<SimpleSessionDAO:startOperation()");
+        log.debug("<< SimpleSessionDAO.beginTransaction()");
     }
 }
