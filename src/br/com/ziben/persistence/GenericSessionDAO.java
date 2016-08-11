@@ -18,6 +18,7 @@ package br.com.ziben.persistence;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -167,7 +168,58 @@ public abstract class GenericSessionDAO<T> {
         }
 		return pages;
     }
+    
+    protected List<T> listForPagination(int start, int finish, Criterion... criterion) {
+		log.info(">>GenericSessionDAO:listForPagination(Criterion)");
+		List<T> pages = null;
+		try {
+            startOperation();
+            
+            Criteria criteria = session.createCriteria(this.classe);
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(finish);
+            
+		    for (final Criterion c : criterion) {
+		    	criteria.add(c);
+		    }
+            
+            pages = criteria.list();
 
+		} catch (HibernateException e) {
+            handleException(e);
+        } finally {
+    		log.info("<<GenericSessionDAO:listForPagination(Criterion)");
+            HibernateFactory.close(session);
+        }
+		return pages;
+    }
+
+    protected List<T> listForPagination(int start, int finish, List<Criterion> criterions) {
+		log.info(">>GenericSessionDAO:listForPagination(Criterion)");
+		List<T> pages = null;
+		try {
+            startOperation();
+            
+            Criteria criteria = session.createCriteria(this.classe);
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(finish);
+            
+		    for (final Criterion c : criterions) {
+		    	criteria.add(c);
+		    }
+            
+            pages = criteria.list();
+
+		} catch (HibernateException e) {
+            handleException(e);
+        } finally {
+    		log.info("<<GenericSessionDAO:listForPagination(Criterion)");
+            HibernateFactory.close(session);
+        }
+		return pages;
+    }
+
+    
     protected List<T> runQueryEntity(String strQuery) {
 		log.info(">>GenericSessionDAO:runQueryEntity()");
 		List<T> list = null;
