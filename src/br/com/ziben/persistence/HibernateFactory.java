@@ -116,7 +116,7 @@ public class HibernateFactory {
     }
     
     /**
-     * Configure a session factory using a ocnfiguration file (hibernate.cfg.xml).
+     * Configure a session factory using a configuration file (hibernate.cfg.xml).
      * If you not provider a path by this file, it will try find where the app starts.
      * So, configure the environment variable "persistence.configuration" point to it.
      * @return
