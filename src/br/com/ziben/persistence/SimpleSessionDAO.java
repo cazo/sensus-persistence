@@ -23,10 +23,10 @@ import org.hibernate.Transaction;
 
 /**
  * Class to handle DAOs by a generic hibernate session factoring;
- * essa classe deve ser usada qunado se quer mais controle do
- * session factory, como acessos a session e transaction para queries
+ * the intents of this implementation is provider full transational
+ * controll over the persistence layer
  * 
- * @author ccardozo
+ * @author claudio cardozo
  *
  */
 public abstract class SimpleSessionDAO {
@@ -36,19 +36,34 @@ public abstract class SimpleSessionDAO {
     public Session session;
     public Transaction tx;
 
+    /**
+     * Creates a valid session
+     */
 	public SimpleSessionDAO() {
         HibernateFactory.buildIfNeeded();
     }
     
+	/**
+	 * Handle exceptions, before rollbacking and throws another one
+	 * @param e
+	 * @throws DataAccessLayerException
+	 */
     public void handleException(HibernateException e) throws DataAccessLayerException {
         HibernateFactory.rollback(tx);
         throw new DataAccessLayerException(e);
     }
 
+    /**
+     * Close the session
+     */
     public void closeTransaction() {
         HibernateFactory.close(session);
     }
     
+    /**
+     * Start the transaction
+     * @throws HibernateException
+     */
     public void beginTransaction() throws HibernateException {
         log.debug(">> SimpleSessionDAO.beginTransaction()");
         session = HibernateFactory.openSession();

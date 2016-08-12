@@ -38,20 +38,27 @@ import org.hibernate.criterion.Projections;
 @SuppressWarnings("unchecked")
 public abstract class GenericSessionDAO<T> {
 	
-	private Logger log = Logger.getLogger("GenericSessionDAO");
+	private Logger log = Logger.getLogger(GenericSessionDAO.class);
 	
     private Session session;
     private Transaction tx;
-	private Class<T> classe;
+	private Class<T> inClass;
 
+	/**
+	 * Get the class that extends me, well...
+	 */
 	public GenericSessionDAO() {
-		this.classe = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		this.inClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 
         HibernateFactory.buildIfNeeded();
     }
 
+	/**
+	 * Save a record represented by T class
+	 * @param obj
+	 */
     protected void persist(T obj) {
-        log.debug(">>GenericSessionDAO:persist(): " + this.classe.toString());
+        log.debug(">> GenericSessionDAO.persist(): " + this.inClass.toString());
         try {
             startOperation();
             session.saveOrUpdate(obj);
@@ -60,12 +67,16 @@ public abstract class GenericSessionDAO<T> {
             handleException(e);
         } finally {
             HibernateFactory.close(session);
-            log.debug("<<GenericSessionDAO:persist(): " + this.classe.toString());
+            log.debug("<< GenericSessionDAO.persist(): " + this.inClass.toString());
         }
     }
 
+    /**
+     * Remove a record represented by T class
+     * @param obj
+     */
     protected void delete(T obj) {
-        log.debug(">>GenericSessionDAO:delete(): " + this.classe.toString());
+        log.debug(">> GenericSessionDAO.delete(): " + this.inClass.toString());
         try {
             startOperation();
             session.delete(obj);
@@ -74,49 +85,64 @@ public abstract class GenericSessionDAO<T> {
             handleException(e);
         } finally {
             HibernateFactory.close(session);
-            log.debug("<<GenericSessionDAO:delete(): " + this.classe.toString());
+            log.debug("<< GenericSessionDAO.delete(): " + this.inClass.toString());
         }
     }
 
+    /**
+     * Find an object by key
+     * @param id
+     * @return the object, if exists
+     */
     protected Object find(Serializable id) {
-        log.debug(">>GenericSessionDAO:find(): " + this.classe.toString());
+        log.debug(">> GenericSessionDAO.find(): " + this.inClass.toString());
         Object obj = null;
         try {
             startOperation();
-            obj = session.load(this.classe, id);
+            obj = session.load(this.inClass, id);
             session.flush();
         } catch (HibernateException e) {
             handleException(e);
         } finally {
             HibernateFactory.close(session);
-        	log.debug("<<GenericSessionDAO:find()");
+        	log.debug("<< GenericSessionDAO.find()");
         }
         return obj;
     }
 
+    /**
+     * Find all records from a entity
+     * @param clazz
+     * @return List<T>
+     */
     protected List<T> findAll(T clazz) {
-        log.debug(">>GenericSessionDAO:findAll(): " + this.classe.toString());
+        log.debug(">> GenericSessionDAO.findAll(): " + this.inClass.toString());
         List<T> objects = null;
         try {
             startOperation();
-            Query query = session.createQuery("from " + this.classe.getName());
+            Query query = session.createQuery("from " + this.inClass.getName());
             objects = query.list();
         } catch (HibernateException e) {
             handleException(e);
         } finally {
             HibernateFactory.close(session);
-        	log.debug("<<GenericSessionDAO:findAll()");
+        	log.debug("<< GenericSessionDAO.findAll()");
         }
         return objects;
     }
 
+    /**
+     * Find records by a Criteiron set of arguments
+     * @param criterion
+     * @return List<T>
+     */
     protected List<T> findByCriteria(Criterion... criterion) {
-		log.info(">>GenericSessionDAO:findByCriteria()");
+		log.info(">> GenericSessionDAO.findByCriteria()");
 		Criteria crit = null;
 		List<T> list = null;
 		try {
             startOperation();
-		    crit = session.createCriteria(this.classe);
+		    crit = session.createCriteria(this.inClass);
 		    for (final Criterion c : criterion) {
 		    	crit.add(c);
 		    }
@@ -124,37 +150,47 @@ public abstract class GenericSessionDAO<T> {
 		} catch (HibernateException e) {
             handleException(e);
         } finally {
-    		log.info("<<GenericSessionDAO:findByCriteria()");
+    		log.info("<< GenericSessionDAO.findByCriteria()");
             HibernateFactory.close(session);
         }
 		return list;
     }
 
+    /**
+     * Return how many records has a entity by T
+     * @return
+     */
     protected Long rowsCount() {
-		log.info(">>GenericSessionDAO:countForPagination()");
+		log.info(">> GenericSessionDAO.countForPagination()");
 		
 		Long count = 0L;
 		
 		try {
             startOperation();
-    		Criteria criteriaCount = session.createCriteria(this.classe);
+    		Criteria criteriaCount = session.createCriteria(this.inClass);
     		criteriaCount.setProjection(Projections.rowCount());
 			count = (Long) criteriaCount.uniqueResult();
 		} catch (HibernateException e) {
             handleException(e);
         } finally {
-    		log.info("<<GenericSessionDAO:countForPagination()");
+    		log.info("<< GenericSessionDAO.countForPagination()");
             HibernateFactory.close(session);
         }
 		return count;
     }
     
+    /**
+     * List for pagination by a T class, using a start and finish records
+     * @param start
+     * @param finish
+     * @return List<T>
+     */
     protected List<T> listForPagination(int start, int finish) {
-		log.info(">>GenericSessionDAO:listForPagination()");
+		log.info(">> GenericSessionDAO.listForPagination()");
 		List<T> pages = null;
 		try {
             startOperation();
-            Criteria criteria = session.createCriteria(this.classe);
+            Criteria criteria = session.createCriteria(this.inClass);
             criteria.setFirstResult(start);
             criteria.setMaxResults(finish);
             pages = criteria.list();
@@ -162,19 +198,26 @@ public abstract class GenericSessionDAO<T> {
 		} catch (HibernateException e) {
             handleException(e);
         } finally {
-    		log.info("<<GenericSessionDAO:listForPagination()");
+    		log.info("<<GenericSessionDAO.listForPagination()");
             HibernateFactory.close(session);
         }
 		return pages;
     }
     
+    /**
+     * List for pagination with a start, a finish and criterias you want
+     * @param start
+     * @param finish
+     * @param criterion
+     * @return List<T>
+     */
     protected List<T> listForPagination(int start, int finish, Criterion... criterion) {
-		log.info(">>GenericSessionDAO:listForPagination(Criterion)");
+		log.info(">> GenericSessionDAO.listForPagination()");
 		List<T> pages = null;
 		try {
             startOperation();
             
-            Criteria criteria = session.createCriteria(this.classe);
+            Criteria criteria = session.createCriteria(this.inClass);
             criteria.setFirstResult(start);
             criteria.setMaxResults(finish);
             
@@ -187,19 +230,26 @@ public abstract class GenericSessionDAO<T> {
 		} catch (HibernateException e) {
             handleException(e);
         } finally {
-    		log.info("<<GenericSessionDAO:listForPagination(Criterion)");
+    		log.info("<< GenericSessionDAO.listForPagination()");
             HibernateFactory.close(session);
         }
 		return pages;
     }
 
+    /**
+     * List for pagination with a start, a finish and a List of criterias you want
+     * @param start
+     * @param finish
+     * @param criterion
+     * @return List<T>
+     */
     protected List<T> listForPagination(int start, int finish, List<Criterion> criterions) {
-		log.info(">>GenericSessionDAO:listForPagination(Criterion)");
+		log.info(">> GenericSessionDAO.listForPagination()");
 		List<T> pages = null;
 		try {
             startOperation();
             
-            Criteria criteria = session.createCriteria(this.classe);
+            Criteria criteria = session.createCriteria(this.inClass);
             criteria.setFirstResult(start);
             criteria.setMaxResults(finish);
             
@@ -212,38 +262,51 @@ public abstract class GenericSessionDAO<T> {
 		} catch (HibernateException e) {
             handleException(e);
         } finally {
-    		log.info("<<GenericSessionDAO:listForPagination(Criterion)");
+    		log.info("<< GenericSessionDAO.listForPagination()");
             HibernateFactory.close(session);
         }
 		return pages;
     }
 
-    
+    /**
+     * Execute a SQL provided, and set the query as an entity represented by T class
+     * @param strQuery
+     * @return
+     */
     protected List<T> runQueryEntity(String strQuery) {
-		log.info(">>GenericSessionDAO:runQueryEntity()");
+		log.info(">> GenericSessionDAO.runQueryEntity()");
 		List<T> list = null;
 		try {
             startOperation();
-		    Query query = session.createSQLQuery(strQuery).addEntity(this.classe);
+		    Query query = session.createSQLQuery(strQuery).addEntity(this.inClass);
 		    list = query.list();
 		} catch (HibernateException e) {
             handleException(e);
         } finally {
-    		log.info("<<GenericSessionDAO:runQueryEntity()");
+    		log.info("<< GenericSessionDAO.runQueryEntity()");
             HibernateFactory.close(session);
         }
 		return list;
     }
     
+    /**
+     * Handle all exceptions on this API
+     * @param e the exceptio
+     * @throws DataAccessLayerException
+     */
     protected void handleException(HibernateException e) throws DataAccessLayerException {
         HibernateFactory.rollback(tx);
         throw new DataAccessLayerException(e);
     }
 
+    /**
+     * Well, the place all starts to work...
+     * @throws HibernateException
+     */
     protected void startOperation() throws HibernateException {
-        log.debug(">>GenericSessionDAO:startOperation()");
+        log.debug(">> GenericSessionDAO.startOperation()");
         session = HibernateFactory.openSession();
         tx = session.beginTransaction();
-        log.debug("<<GenericSessionDAO:startOperation()");
+        log.debug("<< GenericSessionDAO.startOperation()");
     }
 }

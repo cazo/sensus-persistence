@@ -28,7 +28,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
 /**
- * Class for things about Hibernate Factoring
+ * Class for things about Hibernate Factoring and sessions
  * @author ccardozo
  *
  */
@@ -39,52 +39,56 @@ public class HibernateFactory {
     private static Logger log = Logger.getLogger(HibernateFactory.class);
 
     /**
-     * Construa um novo Singleton SessionFactory
-     * @return
+     * Build a new Singleton SessionFactory
+     * @return a session factory
      * @throws HibernateException
      */
     public static SessionFactory buildSessionFactory() throws HibernateException {
+    	
         if (sessionFactory != null) {
-        	log.info(">> buildSessionFactory():closeFactory()");
+        	log.info(">> HibernateFactory.buildSessionFactory()->closeFactory()");
             closeFactory();
         }
         return configureSessionFactory();
     }
 
     /**
-     * Construa um SessionFactory, se já não tiver sido criado.
+     * Build a SessionFactory, if not created.
      */
-    public static SessionFactory buildIfNeeded() throws DataAccessLayerException{
+    public static SessionFactory buildIfNeeded() throws DataAccessLayerException {
+    	
         if (sessionFactory != null) {
-        	log.info(">> buildIfNeeded(): sessionFactory != null");
+        	log.info(">> HibernateFactory.buildIfNeeded() sessionFactory != null");
             return sessionFactory;
         }
+        
         try {
-        	log.info(">> buildIfNeeded(): return configureSessionFactory()");
+        	log.info(">> HibernateFactory.buildIfNeeded() return configureSessionFactory()");
             return configureSessionFactory();
         } catch (HibernateException e) {
             throw new DataAccessLayerException(e);
         }
     }
+    
     public static SessionFactory getSessionFactory() {
-    	log.info(">> getSessionFactory(): return sessionFactory");
+    	log.info(">> HibernateFactory.getSessionFactory() return sessionFactory");
         return sessionFactory;
     }
     
 
     public static Session openSession() throws HibernateException {
         buildIfNeeded();
-    	log.info(">> openSession(): return sessionFactory.openSession()");
+    	log.info(">> HibernateFactory.openSession(): return sessionFactory.openSession()");
         return sessionFactory.openSession();
     }
 
     public static void closeFactory() {
         if (sessionFactory != null) {
             try {
-            	log.info(">> closeFactory(): sessionFactory != null; sessionFactory.close()");
+            	log.info(">> HibernateFactory.closeFactory() sessionFactory != null; sessionFactory.close()");
                 sessionFactory.close();
             } catch (HibernateException ignored) {
-                log.error("Não foi possível fechar a SessionFactory", ignored);
+                log.error("Impossible to close the SessionFactory", ignored);
             }
         }
     }
@@ -92,10 +96,10 @@ public class HibernateFactory {
     public static void close(Session session) {
         if (session != null) {
             try {
-            	log.info(">> close(): session.close()");
+            	log.info(">> HibernateFactoryclose() session.close()");
                 session.close();
             } catch (HibernateException ignored) {
-                log.error("Não foi possivel fechar a sessão", ignored);
+                log.error("Impossible to close a Session", ignored);
             }
         }
     }
@@ -107,25 +111,27 @@ public class HibernateFactory {
                 tx.rollback();
             }
         } catch (HibernateException ignored) {
-            log.error("Não foi possível fazer rollback Transaction", ignored);
+            log.error("Impossible to rollback the Transaction", ignored);
         }
     }
     
     /**
-     *
+     * Configure a session factory using a ocnfiguration file (hibernate.cfg.xml).
+     * If you not provider a path by this file, it will try find where the app starts.
+     * So, configure the environment variable "persistence.configuration" point to it.
      * @return
      * @throws HibernateException
      */
     private static SessionFactory configureSessionFactory() throws HibernateException {
-		log.info(">> configureSessionFactory()");
+		log.info(">> HibernateFactory.configureSessionFactory()");
 
 		try {
 			String nomeArquivo = System.getProperty("persistence.configuration");
 			if (nomeArquivo == null) {
 				nomeArquivo = "./" + "hibernate.cfg.xml";
-				log.info(">> configureSessionFactory(): Setando arquivo de configuracoes " + nomeArquivo);
+				log.debug(">> configureSessionFactory(): configuring the factory from: " + nomeArquivo);
 			}
-			log.debug(">> configureSessionFactory() arquivo de configuracao: " + nomeArquivo);
+			log.debug(">> configureSessionFactory() configuration file: " + nomeArquivo);
 			File configFile = new File(nomeArquivo);
 
 			Configuration configuration = new Configuration();
@@ -134,6 +140,8 @@ public class HibernateFactory {
 			sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			log.info("<< HibernateFactory.configureSessionFactory()");
 		}
 
         return sessionFactory;
