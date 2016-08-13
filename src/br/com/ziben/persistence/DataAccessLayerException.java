@@ -18,7 +18,7 @@ along with sensus-persistence.  If not, see <http://www.gnu.org/licenses/>.
 package br.com.ziben.persistence;
 
 /**
- * Representa Exceptions thrown by the Data Access Layer.
+ * Represents Exceptions thrown by the Data Access Layer.
  */
 public class DataAccessLayerException extends RuntimeException {
     /**
