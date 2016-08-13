@@ -150,6 +150,29 @@ public abstract class GenericSessionDAO<T> {
 		return count;
     }
     
+    protected Long rowsCount(ArrayList<Criterion> criterions) {
+		log.info(">>GenericSessionDAO:countForPagination(criterions)");
+
+		Long count = 0L;
+		
+		try {
+            startOperation();
+    		Criteria criteriaCount = session.createCriteria(this.classe);
+    		criteriaCount.setProjection(Projections.rowCount());
+		    for (final Criterion c : criterions) {
+		    	criteriaCount.add(c);
+		    }
+
+			count = (Long) criteriaCount.uniqueResult();
+		} catch (HibernateException e) {
+            handleException(e);
+        } finally {
+    		log.info("<<GenericSessionDAO:countForPagination(criterions)");
+            HibernateFactory.close(session);
+        }
+		return count;
+    }
+    
     protected List<T> listForPagination(int start, int finish) {
 		log.info(">>GenericSessionDAO:listForPagination()");
 		List<T> pages = null;
@@ -194,7 +217,7 @@ public abstract class GenericSessionDAO<T> {
 		return pages;
     }
 
-    protected List<T> listForPagination(int start, int finish, List<Criterion> criterions) {
+    protected List<T> listForPagination(int start, int finish, ArrayList<Criterion> criterions) {
 		log.info(">>GenericSessionDAO:listForPagination(Criterion)");
 		List<T> pages = null;
 		try {
