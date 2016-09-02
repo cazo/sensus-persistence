@@ -156,6 +156,27 @@ public abstract class GenericSessionDAO<T> {
         }
 		return list;
     }
+    
+    protected List<T> findByCriteria(ArrayList<Criterion> criterions) {
+		log.info(">> GenericSessionDAO.findByCriteria(ArrayList<Criterion>)");
+		Criteria crit = null;
+		List<T> list = null;
+		try {
+            startOperation();
+            
+		    crit = session.createCriteria(this.inClass);
+		    for (final Criterion c : criterions) {
+		    	crit.add(c);
+		    }
+		    list = crit.list();
+		} catch (HibernateException e) {
+            handleException(e);
+        } finally {
+    		log.info("<< GenericSessionDAO.findByCriteria(ArrayList<Criterion>)");
+            HibernateFactory.close(session);
+        }
+		return list;
+    }
 
     /**
      * Return how many records has a entity by T
@@ -268,7 +289,7 @@ public abstract class GenericSessionDAO<T> {
      * @return List<T>
      */
     protected List<T> listForPagination(int start, int finish, ArrayList<Criterion> criterions) {
-		log.info(">>GenericSessionDAO.listForPagination(Criterion)");
+		log.info(">>GenericSessionDAO.listForPagination(int, int, ArrayList<Criterion>)");
 		List<T> pages = null;
 		try {
             startOperation();
@@ -286,7 +307,7 @@ public abstract class GenericSessionDAO<T> {
 		} catch (HibernateException e) {
             handleException(e);
         } finally {
-    		log.info("<<GenericSessionDAO.listForPagination(Criterion)");
+    		log.info("<<GenericSessionDAO.listForPagination(int, int, ArrayList<Criterion>)");
             HibernateFactory.close(session);
         }
 		return pages;
