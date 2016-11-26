@@ -28,6 +28,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 
 /**
@@ -265,11 +266,7 @@ public abstract class GenericSessionDAO<T> {
             Criteria criteria = session.createCriteria(this.inClass);
             criteria.setFirstResult(start);
             criteria.setMaxResults(finish);
-            
-		    for (final Criterion c : criterion) {
-		    	criteria.add(c);
-		    }
-            
+
             pages = criteria.list();
 
 		} catch (HibernateException e) {
@@ -281,6 +278,13 @@ public abstract class GenericSessionDAO<T> {
 		return pages;
     }
 
+    /**
+     * Permite que sejam informados campos para ordenação. 
+     * Deve ser redefinida nos descendentes.
+     * @return
+     */
+    protected abstract List<Order> criteriaOrder();
+    
     /**
      * List for pagination with a start, a finish and a List of criterias you want
      * @param start
@@ -297,6 +301,15 @@ public abstract class GenericSessionDAO<T> {
             Criteria criteria = session.createCriteria(this.inClass);
             criteria.setFirstResult(start);
             criteria.setMaxResults(finish);
+            
+            List<Order> orderList = criteriaOrder();
+            System.out.println("HHHHH");
+            if (orderList != null){
+            	for (final Order order : orderList) {
+            		System.out.println("KKKKKK");
+	            	criteria.addOrder(order);
+				}
+            }
             
 		    for (final Criterion c : criterions) {
 		    	criteria.add(c);
@@ -354,4 +367,8 @@ public abstract class GenericSessionDAO<T> {
         tx = session.beginTransaction();
         log.debug("<< GenericSessionDAO.startOperation()");
     }
+
+	public Session getSession() {
+		return session;
+	}
 }
