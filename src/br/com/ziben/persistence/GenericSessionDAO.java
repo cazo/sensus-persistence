@@ -116,7 +116,7 @@ public abstract class GenericSessionDAO<T> {
      * @param clazz
      * @return List<T>
      */
-    protected List<T> findAll(T clazz) {
+    protected List<T> findAll() {
         log.debug(">> GenericSessionDAO.findAll(): " + this.inClass.toString());
         List<T> objects = null;
         try {
