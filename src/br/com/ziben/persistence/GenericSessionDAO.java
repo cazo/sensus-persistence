@@ -28,6 +28,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 
 /**
@@ -353,5 +354,45 @@ public abstract class GenericSessionDAO<T> {
 
 	public Session getSession() {
 		return session;
+	}
+	
+    protected List<T> listForPaginationA(int start, int finish, ArrayList<Criterion> criterions) {
+		log.info(">>IwAcaoDAO.listForPaginationA(int, int, ArrayList<Criterion>)");
+		List<T> pages = null;
+		try {
+            startOperation();
+            
+            Criteria criteria = getSession().createCriteria(this.inClass);
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(finish);
+            
+            criteria = criteriaDao(criteria);
+            
+//            if (orderList != null){
+//            	for (final Order order : orderList) {
+//	            	criteria.addOrder(order);
+//				}
+//            }
+            
+		    for (final Criterion c : criterions) {
+		    	criteria.add(c);
+		    }
+            
+            pages = criteria.list();
+
+		} catch (HibernateException e) {
+            handleException(e);
+        } finally {
+    		log.info("<<IwAcaoDAO.listForPagination(int, int, ArrayList<Criterion>)");
+            HibernateFactory.close(getSession());
+        }
+		return pages;
+    }
+    
+    protected Criteria criteriaDao(Criteria criteria){
+    	log.info(">>ANCESTRAL IwAcaoDAO.criteriaOrder");
+		criteria.addOrder(Order.desc("codAcao"));
+		log.info("<<IwAcaoDAO.criteriaOrder");
+		return criteria;
 	}
 }
