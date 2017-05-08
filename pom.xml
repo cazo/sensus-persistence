@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>sensus</groupId>
 	<artifactId>sensus-persistence</artifactId>
-	<version>1.0.1</version>
+	<version>1.2.0</version>
 	<description>Modulo de persistencia do Sensus</description>
 
 	<distributionManagement>

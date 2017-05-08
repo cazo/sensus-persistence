@@ -28,7 +28,10 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * Class to handle DAOs by a generic hibernate session factoring
@@ -44,6 +47,8 @@ public abstract class GenericSessionDAO<T> {
     private Session session;
     private Transaction tx;
 	private Class<T> inClass;
+	private ArrayList<Criterion> criterionList = null;
+
 
 	/**
 	 * Get the class that extends me, well...
@@ -178,6 +183,26 @@ public abstract class GenericSessionDAO<T> {
 		return list;
     }
 
+    protected List<T> findByCriteria() {
+		log.info(">> GenericSessionDAO.findByCriteria(ArrayList<Criterion>)");
+		Criteria crit = null;
+		List<T> list = null;
+		try {
+            startOperation();
+            
+		    crit = session.createCriteria(this.inClass);
+		    for (final Criterion c : criterionList) {
+		    	crit.add(c);
+		    }
+		    list = crit.list();
+		} catch (HibernateException e) {
+            handleException(e);
+        } finally {
+    		log.info("<< GenericSessionDAO.findByCriteria(ArrayList<Criterion>)");
+            HibernateFactory.close(session);
+        }
+		return list;
+    }
     /**
      * Return how many records has a entity by T
      * @return
@@ -239,6 +264,7 @@ public abstract class GenericSessionDAO<T> {
             criteria.setFirstResult(start);
             criteria.setMaxResults(finish);
             pages = criteria.list();
+    		log.info(">> GenericSessionDAO.listForPagination() pages size: " + pages.size());
 
 		} catch (HibernateException e) {
             handleException(e);
@@ -330,6 +356,51 @@ public abstract class GenericSessionDAO<T> {
 		return list;
     }
     
+	/**
+	 * Seta o critério Restrictions.eq
+	 * @param campo
+	 * @param valor
+	 */
+	public void setEq(String campo, String valor){
+	   	log.info(">> GenericSessionDAO.setEq");
+		Criterion criterio = Restrictions.eq(campo, valor);
+		criterionList.add(criterio);
+	   	log.info("<< GenericSessionDAO.setEq");
+	}
+	
+    /**
+     * Define o critério de ordenamento
+     * @return
+     */
+    protected List<Order> criteriaOrder(String nameToOrder){
+    	log.info(">>GenericSessionDAO.criteriaOrder");
+		List<Order> order = new ArrayList<Order>();
+		order.add(Order.asc(nameToOrder));
+		log.info("<<GenericSessionDAO.criteriaOrder");
+		return order;
+	}
+    
+	/**
+	 * Seta o critério Restrictions.like
+	 * @param campo
+	 * @param valor
+	 * @param matchMode
+	 */
+	public void setLike(String campo, String valor, MatchMode matchMode){
+		Criterion criterio = Restrictions.ilike(campo, valor, matchMode );
+		criterionList.add(criterio);
+	}
+
+	/**
+	 * Seta o critério Restrictions.like com MatchMode.ANYWHERE
+	 * @param campo
+	 * @param valor
+	 */
+	public void setLike(String campo, String valor){
+		Criterion criterio = Restrictions.ilike(campo, valor, MatchMode.ANYWHERE );
+		criterionList.add(criterio);
+	}
+
     /**
      * Handle all exceptions on this API
      * @param e the exceptio
