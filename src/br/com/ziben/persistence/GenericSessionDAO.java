@@ -213,6 +213,7 @@ public abstract class GenericSessionDAO<T> {
             startOperation();
     		Criteria criteriaCount = session.createCriteria(this.inClass);
     		criteriaCount.setProjection(Projections.rowCount());
+    		
     		// apply criterions, if exist
 		    for (final Criterion c : criterions) {
 		    	criteriaCount.add(c);
@@ -247,9 +248,12 @@ public abstract class GenericSessionDAO<T> {
             startOperation();
     		Criteria criteriaCount = session.createCriteria(this.inClass);
     		criteriaCount.setProjection(Projections.rowCount());
-		    for (Criterion c : criterionList) {
-		    	criteriaCount.add(c);
-		    }
+            // verify if exists criterions to apply
+            if(criterionList != null) {
+    		    for (final Criterion c : criterionList) {
+    		    	criteriaCount.add(c);
+    		    }
+            }
 		    // verify if existe order to apply
 		    if (orderList != null){
             	for (Order order : orderList) {
@@ -281,10 +285,13 @@ public abstract class GenericSessionDAO<T> {
             Criteria criteria = session.createCriteria(this.inClass);
             criteria.setFirstResult(start);
             criteria.setMaxResults(finish);
+            
             // verify if exists criterions to apply
-		    for (final Criterion c : criterionList) {
-		    	criteria.add(c);
-		    }
+            if(criterionList != null) {
+    		    for (final Criterion c : criterionList) {
+    		    	criteria.add(c);
+    		    }
+            }
 
 		    // verify if existe order to apply
 		    if (orderList != null){
@@ -321,7 +328,14 @@ public abstract class GenericSessionDAO<T> {
             Criteria criteria = session.createCriteria(this.inClass);
             criteria.setFirstResult(start);
             criteria.setMaxResults(finish);
-         // verify if existe order to apply
+            
+            // verify if exists criterions to apply
+            if(criterionList != null) {
+    		    for (final Criterion c : criterionList) {
+    		    	criteria.add(c);
+    		    }
+            }
+            // verify if existe order to apply
 		    if (orderList != null){
             	for (final Order order : orderList) {
 	            	criteria.addOrder(order);
