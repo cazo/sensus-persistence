@@ -88,6 +88,7 @@ public abstract class GenericSessionDAO<T> {
             session.delete(obj);
             tx.commit();
         } catch (HibernateException e) {
+        	tx.rollback();
             handleException(e);
         } finally {
             HibernateFactory.close(session);
@@ -95,6 +96,28 @@ public abstract class GenericSessionDAO<T> {
         }
     }
 
+    /**
+     * Clean a Table represented by T class
+     * @param obj
+     */
+    protected void clean() {
+        log.debug(">> GenericSessionDAO.clean(): " + this.inClass.toString());
+        try {
+            startOperation();
+            
+            String hql = String.format("delete from %s", this.inClass.getName());
+            Query query = session.createQuery(hql); 
+            query.executeUpdate();
+            tx.commit();
+        } catch (HibernateException e) {
+        	tx.rollback();
+            handleException(e);
+        } finally {
+            HibernateFactory.close(session);
+            log.debug("<< GenericSessionDAO.clean(): " + this.inClass.toString());
+        }
+    }
+    
     /**
      * Find an object by key
      * @param id
@@ -116,6 +139,7 @@ public abstract class GenericSessionDAO<T> {
         return obj;
     }
 
+    
     /**
      * Find all records from a entity
      * @param clazz
