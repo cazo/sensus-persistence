@@ -76,6 +76,24 @@ public abstract class GenericSessionDAO<T> {
             log.debug("<< GenericSessionDAO.persist(): " + this.inClass.toString());
         }
     }
+    
+	/**
+	 * Save a record represented by T class
+	 * @param obj
+	 */
+    protected void save(T obj) {
+        log.debug(">> GenericSessionDAO.save(): " + this.inClass.toString());
+        try {
+            startOperation();
+            session.save(obj);
+            tx.commit();
+        } catch (HibernateException e) {
+            handleException(e);
+        } finally {
+            HibernateFactory.close(session);
+            log.debug("<< GenericSessionDAO.save(): " + this.inClass.toString());
+        }
+    }
 
     /**
      * Remove a record represented by T class
