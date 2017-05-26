@@ -55,7 +55,6 @@ public abstract class GenericSessionDAO<T> {
 	 */
 	public GenericSessionDAO() {
 		this.inClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-
         HibernateFactory.buildIfNeeded();
     }
 
@@ -168,14 +167,17 @@ public abstract class GenericSessionDAO<T> {
      */
     protected List<T> findByCriteria(Criterion... criterion) {
 		log.info(">> GenericSessionDAO.findByCriteria()");
-		Criteria crit = null;
 		List<T> list = null;
 		try {
             startOperation();
-		    crit = session.createCriteria(this.inClass);
-		    for (final Criterion c : criterion) {
-		    	crit.add(c);
-		    }
+            
+            Criteria crit = session.createCriteria(this.inClass);
+            // verify if criteria exists
+            if(criterion != null) {
+			    for (final Criterion c : criterion) {
+			    	crit.add(c);
+			    }
+            }
 		    list = crit.list();
 		} catch (HibernateException e) {
             handleException(e);
@@ -188,15 +190,17 @@ public abstract class GenericSessionDAO<T> {
     
     protected List<T> findByCriteria(ArrayList<Criterion> criterions) {
 		log.info(">> GenericSessionDAO.findByCriteria(ArrayList<Criterion>)");
-		Criteria crit = null;
 		List<T> list = null;
 		try {
             startOperation();
             
-		    crit = session.createCriteria(this.inClass);
-		    for (final Criterion c : criterions) {
-		    	crit.add(c);
-		    }
+            Criteria crit = session.createCriteria(this.inClass);
+            // verify if criteria exists
+            if(criterions != null) {
+			    for (final Criterion c : criterions) {
+			    	crit.add(c);
+			    }
+            }
 		    list = crit.list();
 		} catch (HibernateException e) {
             handleException(e);
@@ -215,9 +219,19 @@ public abstract class GenericSessionDAO<T> {
             startOperation();
             
 		    crit = session.createCriteria(this.inClass);
-		    for (final Criterion c : criterionList) {
-		    	crit.add(c);
+		    // verify is exists some criterias to apply
+		    if(criterionList != null) {
+			    for (final Criterion c : criterionList) {
+			    	crit.add(c);
+			    }
 		    }
+		    // verify if existe order to apply
+		    if (orderList != null){
+            	for (final Order order : orderList) {
+            		crit.addOrder(order);
+				}
+            }
+
 		    list = crit.list();
 		} catch (HibernateException e) {
             handleException(e);
@@ -239,9 +253,11 @@ public abstract class GenericSessionDAO<T> {
     		criteriaCount.setProjection(Projections.rowCount());
     		
     		// apply criterions, if exist
-		    for (final Criterion c : criterions) {
-		    	criteriaCount.add(c);
-		    }
+    		if(criterions != null) {
+			    for (final Criterion c : criterions) {
+			    	criteriaCount.add(c);
+			    }
+    		}
 		    // verify if existe order to apply
 		    if (orderList != null){
             	for (final Order order : orderList) {
@@ -391,12 +407,16 @@ public abstract class GenericSessionDAO<T> {
             startOperation();
             
             Criteria criteria = session.createCriteria(this.inClass);
+            // setting the range
             criteria.setFirstResult(start);
             criteria.setMaxResults(finish);
             
-		    for (final Criterion c : criterions) {
-		    	criteria.add(c);
-		    }
+            // verify if exists criterias
+            if(criterions != null) {
+			    for (final Criterion c : criterions) {
+			    	criteria.add(c);
+			    }
+            }
             // verify if existe order to apply
 		    if (orderList != null){
             	for (final Order order : orderList) {
@@ -437,7 +457,7 @@ public abstract class GenericSessionDAO<T> {
     }
     
 	/**
-	 * Seta o critério Restrictions.eq
+	 * Set the criteria Restrictions.eq
 	 * @param campo
 	 * @param valor
 	 */
@@ -454,7 +474,6 @@ public abstract class GenericSessionDAO<T> {
      */
     public void setOrderAsc(String nameToOrder){
     	log.info(">>GenericSessionDAO.setOrderAsc");
-		//List<Order> order = new ArrayList<Order>();
     	orderList.add(Order.asc(nameToOrder));
 		log.info("<<GenericSessionDAO.setOrderAsc");
 
@@ -466,14 +485,13 @@ public abstract class GenericSessionDAO<T> {
      */
     public void setOrderDesc(String nameToOrder){
     	log.info(">>GenericSessionDAO.setOrderDesc");
-		//List<Order> order = new ArrayList<Order>();
     	orderList.add(Order.desc(nameToOrder));
 		log.info("<<GenericSessionDAO.setOrderDesc");
 
 	}
 
 	/**
-	 * Seta o critério Restrictions.like
+	 * Set the criteria Restrictions.like
 	 * @param campo
 	 * @param valor
 	 * @param matchMode
@@ -484,7 +502,7 @@ public abstract class GenericSessionDAO<T> {
 	}
 
 	/**
-	 * Seta o critério Restrictions.like com MatchMode.ANYWHERE
+	 * Set the critria Restrictions.like with MatchMode.ANYWHERE
 	 * @param campo
 	 * @param valor
 	 */
@@ -495,7 +513,7 @@ public abstract class GenericSessionDAO<T> {
 
     /**
      * Handle all exceptions on this API
-     * @param e the exceptio
+     * @param e the exception
      * @throws DataAccessLayerException
      */
     protected void handleException(HibernateException e) throws DataAccessLayerException {
