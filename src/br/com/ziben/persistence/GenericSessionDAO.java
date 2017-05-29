@@ -47,7 +47,7 @@ public abstract class GenericSessionDAO<T> {
     private Session session;
     private Transaction tx;
 	private Class<T> inClass;
-	private ArrayList<Criterion> criterionList = null;
+	private ArrayList<Criterion> criterionList = new ArrayList<Criterion>();
 	private List<Order> orderList = new ArrayList<Order>();
 
 	/**
@@ -200,6 +200,7 @@ public abstract class GenericSessionDAO<T> {
      * Find records by a Criteiron set of arguments
      * @param criterion
      * @return List<T>
+     * @deprecated
      */
     protected List<T> findByCriteria(Criterion... criterion) {
 		log.info(">> GenericSessionDAO.findByCriteria()");
@@ -224,6 +225,12 @@ public abstract class GenericSessionDAO<T> {
 		return list;
     }
     
+    /**
+     * find by criteria usinf a array of criterions
+     * @param criterions
+     * @return
+     * @deprecated
+     */
     protected List<T> findByCriteria(ArrayList<Criterion> criterions) {
 		log.info(">> GenericSessionDAO.findByCriteria(ArrayList<Criterion>)");
 		List<T> list = null;
@@ -247,6 +254,10 @@ public abstract class GenericSessionDAO<T> {
 		return list;
     }
 
+    /**
+     * find by criteria based on criterion list and Order list setted first
+     * @return
+     */
     protected List<T> findByCriteria() {
 		log.info(">> GenericSessionDAO.findByCriteria()");
 		Criteria crit = null;
@@ -261,7 +272,7 @@ public abstract class GenericSessionDAO<T> {
 			    	crit.add(c);
 			    }
 		    }
-		    // verify if existe order to apply
+		    // verify if exists order to apply
 		    if (orderList != null){
             	for (final Order order : orderList) {
             		crit.addOrder(order);
@@ -278,6 +289,12 @@ public abstract class GenericSessionDAO<T> {
 		return list;
     }
     
+    /**
+     * table rows count giving a criterion list
+     * @param criterions
+     * @return
+     * @deprecated use rowsCountCriteria() setting the criterias or ordering
+     */
     protected Long rowsCount(ArrayList<Criterion> criterions) {
 		log.info(">>GenericSessionDAO:countForPagination(criterions)");
 
@@ -311,10 +328,18 @@ public abstract class GenericSessionDAO<T> {
 		return count;
     }
     
+    /**
+     * table rows count
+     * @return
+     */
     protected Long rowsCount() {
     	return rowsCountCriteria();
     }
     
+    /**
+     * table rowns count with criterias and ordering if you want
+     * @return numer of regsters
+     */
     protected Long rowsCountCriteria() {
 		log.info(">>GenericSessionDAO.rowsCountCriteria()");
 
@@ -494,13 +519,15 @@ public abstract class GenericSessionDAO<T> {
     
 	/**
 	 * Set the criteria Restrictions.eq
-	 * @param campo
-	 * @param valor
+	 * @param field
+	 * @param value
 	 */
-	public void setEq(String campo, String valor){
+	public void setEq(String field, String value){
 	   	log.info(">> GenericSessionDAO.setEq");
-		Criterion criterio = Restrictions.eq(campo, valor);
-		criterionList.add(criterio);
+	   	if(field != null && value != null) {
+			Criterion criterio = Restrictions.eq(field, value);
+			criterionList.add(criterio);
+	   	}
 	   	log.info("<< GenericSessionDAO.setEq");
 	}
 	
@@ -510,7 +537,9 @@ public abstract class GenericSessionDAO<T> {
      */
     public void setOrderAsc(String nameToOrder){
     	log.info(">>GenericSessionDAO.setOrderAsc");
-    	orderList.add(Order.asc(nameToOrder));
+    	if(nameToOrder != null) {
+    		orderList.add(Order.asc(nameToOrder));
+    	}
 		log.info("<<GenericSessionDAO.setOrderAsc");
 
 	}
@@ -521,20 +550,26 @@ public abstract class GenericSessionDAO<T> {
      */
     public void setOrderDesc(String nameToOrder){
     	log.info(">>GenericSessionDAO.setOrderDesc");
-    	orderList.add(Order.desc(nameToOrder));
+    	if(nameToOrder != null) {
+    		orderList.add(Order.desc(nameToOrder));
+    	}
 		log.info("<<GenericSessionDAO.setOrderDesc");
 
 	}
 
 	/**
 	 * Set the criteria Restrictions.like
-	 * @param campo
-	 * @param valor
+	 * @param field
+	 * @param value
 	 * @param matchMode
 	 */
-	public void setLike(String campo, String valor, MatchMode matchMode){
-		Criterion criterio = Restrictions.ilike(campo, valor, matchMode );
-		criterionList.add(criterio);
+	public void setLike(String field, String value, MatchMode matchMode){
+    	log.info(">>GenericSessionDAO.setLike(String, String, MatchMode)");
+    	if(field != null && value != null) {
+			Criterion criterio = Restrictions.ilike(field, value, matchMode );
+			criterionList.add(criterio);
+    	}
+    	log.info(">>GenericSessionDAO.setLike(String, String, MatchMode)");
 	}
 
 	/**
@@ -542,9 +577,13 @@ public abstract class GenericSessionDAO<T> {
 	 * @param campo
 	 * @param valor
 	 */
-	public void setLike(String campo, String valor){
-		Criterion criterio = Restrictions.ilike(campo, valor, MatchMode.ANYWHERE );
-		criterionList.add(criterio);
+	public void setLike(String field, String value){
+    	log.info(">>GenericSessionDAO.setLike(String, String)");
+    	if(field != null && value != null) {
+			Criterion criterio = Restrictions.ilike(field, value, MatchMode.ANYWHERE );
+			criterionList.add(criterio);
+    	}
+    	log.info(">>GenericSessionDAO.setLike(String, String)");
 	}
 
     /**
@@ -568,6 +607,10 @@ public abstract class GenericSessionDAO<T> {
         log.debug("<< GenericSessionDAO.startOperation()");
     }
 
+    /**
+     * just return the current session
+     * @return
+     */
 	public Session getSession() {
 		return session;
 	}
