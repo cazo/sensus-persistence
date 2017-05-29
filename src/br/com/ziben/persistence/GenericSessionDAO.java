@@ -530,7 +530,21 @@ public abstract class GenericSessionDAO<T> {
 	   	}
 	   	log.info("<< GenericSessionDAO.setEq");
 	}
-	
+
+	/**
+	 * Set the criteria Restrictions.eq
+	 * @param field
+	 * @param value
+	 */
+	public void setEq(String field, Serializable value){
+	   	log.info(">> GenericSessionDAO.setEq");
+	   	if(field != null && value != null) {
+			Criterion criterio = Restrictions.eq(field, value);
+			criterionList.add(criterio);
+	   	}
+	   	log.info("<< GenericSessionDAO.setEq");
+	}
+
 	/**
      * Define ascending ordering
      * @return
