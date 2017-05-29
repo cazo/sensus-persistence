@@ -587,17 +587,18 @@ public abstract class GenericSessionDAO<T> {
 	}
 
 	/**
-	 * Set the critria Restrictions.like with MatchMode.ANYWHERE
+	 * Set the criteria Restrictions.like with MatchMode.ANYWHERE
 	 * @param campo
 	 * @param valor
 	 */
 	public void setLike(String field, String value){
     	log.info(">>GenericSessionDAO.setLike(String, String)");
     	if(field != null && value != null) {
-			Criterion criterio = Restrictions.ilike(field, value, MatchMode.ANYWHERE );
+    		Criterion criterio = Restrictions.ilike(field, value, MatchMode.ANYWHERE );
 			criterionList.add(criterio);
     	}
-    	log.info(">>GenericSessionDAO.setLike(String, String)");
+    	log.info("<<GenericSessionDAO.setLike(String, String)");
+
 	}
 
     /**
