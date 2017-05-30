@@ -617,19 +617,6 @@ public abstract class GenericSessionDAO<T> {
 	   	log.info("<< GenericSessionDAO.setBetween()");
 	}
 
-	/**
-	 * Set the criteria Restrictions.between
-	 * @param field
-	 * @param minor date
-	 * @param major date
-	 */
-	public void setBetween(String field, Date minorData, Date majorData){
-    	log.info(">>GenericSessionDAO.setBetween(String, Date, Date)");
-		Criterion criterio = Restrictions.between(field, minorData, majorData);
-		criterionList.add(criterio);
-    	log.info("<<GenericSessionDAO.setBetween(String, Date, Date)");
-	}
-
     /**
      * Handle all exceptions on this API
      * @param e the exception
