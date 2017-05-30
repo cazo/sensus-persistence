@@ -85,7 +85,7 @@ public abstract class GenericSessionDAO<T> {
         log.debug(">> GenericSessionDAO.save(): " + this.inClass.toString());
         try {
             startOperation();
-            session.saveOrUpdate(obj);
+            session.save(obj);
             tx.commit();
         } catch (HibernateException e) {
             handleException(e);
