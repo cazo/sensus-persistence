@@ -601,6 +601,21 @@ public abstract class GenericSessionDAO<T> {
     	log.info("<<GenericSessionDAO.setLike(String, String)");
 
 	}
+	
+	/**
+	 * Set the criteria Restrictions.between 
+	 * @param field
+	 * @param minorDate
+	 * @param majorDate
+	 */
+	public void setBetween(String field, Date minorDate, Date majorDate){
+	   	log.info(">> GenericSessionDAO.setBetween()");
+	   	if(field != null && minorDate != null && majorDate != null) {
+			Criterion criterio = Restrictions.between(field, minorDate, majorDate);
+			criterionList.add(criterio);
+	   	}
+	   	log.info("<< GenericSessionDAO.setBetween()");
+	}
 
 	/**
 	 * Set the criteria Restrictions.between
