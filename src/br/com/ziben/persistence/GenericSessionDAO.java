@@ -19,6 +19,7 @@ package br.com.ziben.persistence;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -599,6 +600,19 @@ public abstract class GenericSessionDAO<T> {
     	}
     	log.info("<<GenericSessionDAO.setLike(String, String)");
 
+	}
+
+	/**
+	 * Set the criteria Restrictions.between
+	 * @param field
+	 * @param minor date
+	 * @param major date
+	 */
+	public void setBetween(String field, Date minorData, Date majorData){
+    	log.info(">>GenericSessionDAO.setBetween(String, Date, Date)");
+		Criterion criterio = Restrictions.between(field, minorData, majorData);
+		criterionList.add(criterio);
+    	log.info("<<GenericSessionDAO.setBetween(String, Date, Date)");
 	}
 
     /**
