@@ -198,6 +198,36 @@ public abstract class GenericSessionDAO<T> {
     }
 
     /**
+     * find by criteria based on Order list setted first
+     * @return
+     */
+    protected List<T> findAllByCriteria() {
+		log.info(">> GenericSessionDAO.findByCriteria()");
+		//Criteria crit = null;
+		List<T> list = null;
+		try {
+            startOperation();
+            
+            Criteria crit = session.createCriteria(this.inClass);
+
+		    // verify if exists order to apply
+		    if (orderList != null){
+            	for (final Order order : orderList) {
+            		crit.addOrder(order);
+				}
+            }
+
+		    list = crit.list();
+		} catch (HibernateException e) {
+            handleException(e);
+        } finally {
+    		log.info("<< GenericSessionDAO.findByCriteria()");
+            HibernateFactory.close(session);
+        }
+		return list;
+    }
+
+    /**
      * Find records by a Criteiron set of arguments
      * @param criterion
      * @return List<T>
