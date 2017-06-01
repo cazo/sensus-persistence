@@ -50,11 +50,20 @@ public abstract class GenericSessionDAO<T> {
 	private Class<T> inClass;
 	private ArrayList<Criterion> criterionList = new ArrayList<Criterion>();
 	private List<Order> orderList = new ArrayList<Order>();
+	
+	private boolean executingTransaction = false;
 
 	/**
 	 * Get the class that extends me, well...
 	 */
 	public GenericSessionDAO() {
+		this.inClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        HibernateFactory.buildIfNeeded();
+    }
+	
+	public GenericSessionDAO(SessionDAOCtrl sessionParam) {
+		this.session= sessionParam.getSession();
+		this.tx = sessionParam.getSession().getTransaction();
 		this.inClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         HibernateFactory.buildIfNeeded();
     }
@@ -67,13 +76,31 @@ public abstract class GenericSessionDAO<T> {
         log.debug(">> GenericSessionDAO.persist(): " + this.inClass.toString());
         try {
             startOperation();
-            session.saveOrUpdate(obj);
-            tx.commit();
+            persist(obj, session);
+//            session.saveOrUpdate(obj);
+//            tx.commit();
         } catch (HibernateException e) {
             handleException(e);
         } finally {
             HibernateFactory.close(session);
             log.debug("<< GenericSessionDAO.persist(): " + this.inClass.toString());
+        }
+    }
+    
+    protected void persist(T obj, Session sessionParam) {
+        log.debug(">> GenericSessionDAO.persist(T, Session): " + this.inClass.toString());
+        try {
+            sessionParam.saveOrUpdate(obj);
+            if (!executingTransaction){
+            	sessionParam.getTransaction().commit();
+            }
+        } catch (HibernateException e) {
+            handleException(e);
+        } finally {
+        	if (!executingTransaction){
+        		HibernateFactory.close(sessionParam);
+        	}
+            log.debug("<< GenericSessionDAO.persist(T, Session): " + this.inClass.toString());
         }
     }
     
@@ -84,16 +111,43 @@ public abstract class GenericSessionDAO<T> {
     protected void save(T obj) {
         log.debug(">> GenericSessionDAO.save(): " + this.inClass.toString());
         try {
-            startOperation();
-            session.save(obj);
-            tx.commit();
+        	if (!executingTransaction){
+        		startOperation();
+        		session.save(obj);
+        		tx.commit();
+        	} else {
+        		session.save(obj);        		
+        	}
+        	
+//            save(obj, this.session);
+//            session.save(obj);
+//            tx.commit();
+
+            
         } catch (HibernateException e) {
             handleException(e);
         } finally {
-            HibernateFactory.close(session);
+        	if (!executingTransaction){
+        		HibernateFactory.close(this.session);
+        	}
             log.debug("<< GenericSessionDAO.save(): " + this.inClass.toString());
         }
     }
+    
+//    protected void save(T obj, Session session) {
+//        log.debug(">> GenericSessionDAO.save(): " + this.inClass.toString());
+//        try {
+//            session.save(obj);
+//            if (!executingTransaction){
+//            	session.getTransaction().commit();
+//            }
+//        } catch (HibernateException e) {
+//            handleException(e);
+//        } finally {
+//            HibernateFactory.close(session);
+//            log.debug("<< GenericSessionDAO.save(): " + this.inClass.toString());
+//        }
+//    }
     
 	/**
 	 * Update a record represented by T class
@@ -624,6 +678,7 @@ public abstract class GenericSessionDAO<T> {
      */
     protected void handleException(HibernateException e) throws DataAccessLayerException {
         HibernateFactory.rollback(tx);
+        executingTransaction = false;
         throw new DataAccessLayerException(e);
     }
 
@@ -635,14 +690,52 @@ public abstract class GenericSessionDAO<T> {
         log.debug(">> GenericSessionDAO.startOperation()");
         session = HibernateFactory.openSession();
         tx = session.beginTransaction();
+        executingTransaction = false; // just in case........
         log.debug("<< GenericSessionDAO.startOperation()");
+    }
+    
+    protected void startNewSession() throws HibernateException {
+        log.debug(">> GenericSessionDAO.getNewSession()");
+        session = HibernateFactory.openSession();
+        log.debug("<< GenericSessionDAO.getNewSession()");
+    }
+    
+    protected void beginTransaction() throws HibernateException {
+        log.debug(">> GenericSessionDAO.initTransaction()");
+        session.beginTransaction();
+        executingTransaction = true;
+        log.debug("<< GenericSessionDAO.initTransaction()");
+    }
+    
+    protected void commitTransaction() throws HibernateException {
+        log.debug(">> GenericSessionDAO.initTransaction()");
+        session.getTransaction().commit();
+        executingTransaction = false;
+        HibernateFactory.close(session);
+        log.debug("<< GenericSessionDAO.initTransaction()");
+    }
+    
+    protected void rollbackTransaction() throws HibernateException {
+        log.debug(">> GenericSessionDAO.initTransaction()");
+        session.getTransaction().rollback();
+        executingTransaction = false;
+        HibernateFactory.close(session);
+        log.debug("<< GenericSessionDAO.initTransaction()");
     }
 
     /**
      * just return the current session
      * @return
      */
-	public Session getSession() {
+	protected Session getSession() {
 		return session;
 	}
+
+//	public boolean isExecutingTransaction() {
+//		return executingTransaction;
+//	}
+//
+//	public void setExecutingTransaction(boolean executingTransaction) {
+//		this.executingTransaction = executingTransaction;
+//	}
 }
