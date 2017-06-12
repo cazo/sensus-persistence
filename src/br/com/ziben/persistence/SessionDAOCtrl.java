@@ -19,7 +19,6 @@ package br.com.ziben.persistence;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 
 
@@ -34,15 +33,14 @@ public class SessionDAOCtrl extends GenericSessionDAO<SessionDAOCtrl> {
 	
 	private static final Logger log = Logger.getLogger(SessionDAOCtrl.class);
 	
-    private Session sessionCtrl;
-    private Transaction txCtrl;
+//    private Session sessionCtrl;
+//    private Transaction txCtrl;
 
 	/**
 	 * Get the class that extends me, well...
 	 */
 	public SessionDAOCtrl() {
-		super();
-		super.startNewSession();
+		super.openSession();
     }
 	
     /**
@@ -50,7 +48,7 @@ public class SessionDAOCtrl extends GenericSessionDAO<SessionDAOCtrl> {
      * @return
      */
 	public Session getSession() {
-		return sessionCtrl;
+		return super.getSession();
 	}
 	
 	
