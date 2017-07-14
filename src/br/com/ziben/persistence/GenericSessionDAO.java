@@ -31,6 +31,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -50,6 +51,7 @@ public abstract class GenericSessionDAO<T> {
 	private Class<T> inClass;
 	private ArrayList<Criterion> criterionList = new ArrayList<Criterion>();
 	private List<Order> orderList = new ArrayList<Order>();
+	private ProjectionList projectionList = Projections.projectionList();
 	
 	private boolean executingTransaction = false;
 	private SessionDAOCtrl sessionDAOCtrl = null;
@@ -287,6 +289,11 @@ public abstract class GenericSessionDAO<T> {
             		crit.addOrder(order);
 				}
             }
+		    
+		    // verify if exists fields to retrieve
+		    if (projectionList != null && projectionList.getLength() > 0){
+		    	crit.setProjection(projectionList);
+            }
 
 		    list = crit.list();
 		} catch (HibernateException e) {
@@ -404,6 +411,11 @@ public abstract class GenericSessionDAO<T> {
             		crit.addOrder(order);
 				}
             }
+		    
+		    // verify if exists fields to retrieve
+		    if (projectionList != null && projectionList.getLength() > 0){
+		    	crit.setProjection(projectionList);
+            }
 
 		    list = crit.list();
 		} catch (HibernateException e) {
@@ -451,6 +463,11 @@ public abstract class GenericSessionDAO<T> {
             	for (final Order order : orderList) {
             		criteriaCount.addOrder(order);
 				}
+            }
+		    
+		    // verify if exists fields to retrieve
+		    if (projectionList != null && projectionList.getLength() > 0){
+		    	criteriaCount.setProjection(projectionList);
             }
 
 			count = (Long) criteriaCount.uniqueResult();
@@ -505,6 +522,11 @@ public abstract class GenericSessionDAO<T> {
             		criteriaCount.addOrder(order);
 				}
             }
+		    
+		    // verify if exists fields to retrieve
+		    if (projectionList != null && projectionList.getLength() > 0){
+		    	criteriaCount.setProjection(projectionList);
+            }
 
 			count = (Long) criteriaCount.uniqueResult();
 		} catch (HibernateException e) {
@@ -552,6 +574,11 @@ public abstract class GenericSessionDAO<T> {
             	for (final Order order : orderList) {
 	            	criteria.addOrder(order);
 				}
+            }
+		    
+		    // verify if exists fields to retrieve
+		    if (projectionList != null && projectionList.getLength() > 0){
+		    	criteria.setProjection(projectionList);
             }
 		    
             pages = criteria.list();
@@ -603,6 +630,11 @@ public abstract class GenericSessionDAO<T> {
 	            	criteria.addOrder(order);
 				}
             }
+		    
+		    // verify if exists fields to retrieve
+		    if (projectionList != null && projectionList.getLength() > 0){
+		    	criteria.setProjection(projectionList);
+            }
 
             pages = criteria.list();
 
@@ -653,6 +685,12 @@ public abstract class GenericSessionDAO<T> {
 	            	criteria.addOrder(order);
 				}
             }
+		    
+		    // verify if exists fields to retrieve
+		    if (projectionList != null  && projectionList.getLength() > 0){
+		    	criteria.setProjection(projectionList);
+            }
+		    
             pages = criteria.list();
 
 		} catch (HibernateException e) {
@@ -794,6 +832,21 @@ public abstract class GenericSessionDAO<T> {
 			criterionList.add(criterio);
 	   	}
 	   	log.info("<< GenericSessionDAO.setBetween()");
+	}
+	
+	/**
+      * Set the fields to retrieve from a table 
+	 * @param fields list
+     */
+    public void setProjectionFields(List<String> fieldsList){
+    	log.info(">>GenericSessionDAO.setProjectionFields");
+    	
+    	if (fieldsList != null){
+        	for (final String field : fieldsList) {
+        		projectionList.add(Projections.property(field), field);
+			}
+        }
+		log.info("<<GenericSessionDAO.setProjectionFields");
 	}
 
     /**
