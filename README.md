@@ -1,6 +1,6 @@
-# README #
+# Simple persistence API with Hibernate using SessionFactory #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+This guide will help you whatever steps are necessary to get API up and running.
 
 ### What is this repository for? ###
 
